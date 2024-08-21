@@ -13,7 +13,7 @@ const Auth = () => {
   const { isAuthenticated, loading } = UrlState();
   // agar user authenticated hai tab usko '/auth' ka access matt do, wapas dashboard pr router karwa do
   useEffect(() => {
-    // agar user authenticated hai aur loading false hai toh user ko  redirect karwa do dashboard par.
+    // agar user authenticated hai aur loading false hai toh user ko redirect karwa do dashboard par.
     if (isAuthenticated && !loading) {
       navigate(`/dashboard?${longLink ? `createNew=${longLink}'` : ""}`);
     }

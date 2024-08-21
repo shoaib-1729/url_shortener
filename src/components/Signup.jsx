@@ -23,14 +23,46 @@ const Login = () => {
   const [errors, setErrors] = useState([]);
   // states for setting form data
   const [formData, setFormData] = useState({
+    name: "",
     email: "",
     password: "",
+    profile_pic: null,
   });
   // use navigate for navigating the user to dashboard after successful authentication
   const navigate = useNavigate();
   // get the long link from  createNew param using useSearchParam hook
   let [searchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
+
+  //  handle input change
+  function handleInputChange(e) {
+    // fetch name and value from target input element
+    const { name, value, files } = e.target;
+    // set the state
+    setFormData((prevState) => {
+      // spread the previous fields and set the new field, and return the updated  object
+      return {
+        ...prevState,
+        // if there is somethings inside of files then take file, instead take the value
+        [name]: files ? files[0] : value,
+      };
+    });
+  }
+  //  use fetch to fetch the data, yeh login ko call kar dega form data ke saath, phir supabase verify karega, abhi call nahi hua hai fnLogin, bss return kar diya hai
+  const { data, error, loading, fn: fnSignup } = useFetch(signUp, formData);
+
+  // get the use data from UrlState
+  const { fetchUser } = UrlState();
+
+  useEffect(() => {
+    console.log(data);
+    // agar error nahi hai aur user data hai to use ko dashboard par navigate kara do
+    if (error === null && data) {
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}'` : ""}`);
+      // fetch the user data after login successfully
+      fetchUser();
+    }
+  }, [error, loading]);
 
   // handle validation on login button click
   async function handleSignup() {
@@ -63,35 +95,7 @@ const Login = () => {
       setErrors(newError);
     }
   }
-  //   use fetch to fetch the data, yeh login ko call kar dega form data ke saath, phir supabase verify karega, abhi call nahi hua hai fnLogin, bss return kar diya hai
-  const { data, error, loading, fn: fnSignup } = useFetch(signUp, formData);
 
-  // get the use data from UrlState
-  const { fetchUser } = UrlState();
-
-  useEffect(() => {
-    console.log(data);
-    // agar error nahi hai aur user data hai to use ko dashboard par navigate kara do
-    if (error === null && data) {
-      navigate(`/dashboard?${longLink ? `createNew=${longLink}'` : ""}`);
-      // fetch the user data after login successfully
-      fetchUser();
-    }
-  }, [data, error]);
-
-  //  handle input change
-  function handleInputChange(e) {
-    // fetch name and value from target input element
-    const { name, value } = e.target;
-    // set the state
-    setFormData((prevState) => {
-      // spread the previous fields and set the new field, and return the updated  object
-      return {
-        ...prevState,
-        [name]: value,
-      };
-    });
-  }
   return (
     <div>
       <Card>
